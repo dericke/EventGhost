@@ -80,15 +80,14 @@ class ButtonRow(object):
                 sizer.Add(self.sizeGrip.GetSize(), 1, wx.EXPAND)
                 sizer.Add(buttonSizer, 0, wx.TOP | wx.BOTTOM, 6)
             sizer.Add(self.sizeGrip, 0, wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT)
+        elif center:
+            sizer.Add((3, 3), 1, wx.EXPAND)
+            sizer.Add(buttonSizer, 0, wx.TOP | wx.BOTTOM, 6)
+            sizer.Add((3, 3), 1, wx.EXPAND)
         else:
-            if center:
-                sizer.Add((3, 3), 1, wx.EXPAND)
-                sizer.Add(buttonSizer, 0, wx.TOP | wx.BOTTOM, 6)
-                sizer.Add((3, 3), 1, wx.EXPAND)
-            else:
-                sizer.Add((3, 3), 1)
-                sizer.Add(buttonSizer, 0, wx.TOP | wx.BOTTOM, 6)
-                sizer.Add((3, 3), 0)
+            sizer.Add((3, 3), 1)
+            sizer.Add(buttonSizer, 0, wx.TOP | wx.BOTTOM, 6)
+            sizer.Add((3, 3), 0)
 
     def Add(
         self,

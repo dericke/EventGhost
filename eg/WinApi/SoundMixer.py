@@ -252,27 +252,25 @@ def GetDeviceId(deviceId, strVal=False):
     if strVal and deviceId == "Primary Sound Driver":
         deviceId = 0
     if isinstance(deviceId, int):
-        if strVal:
-            devices = GetMixerDevices()
-
-            if -1 < deviceId < len(devices) - 1:
-                return devices[deviceId]
-            else:
-                # return devices[0]
-                raise SoundMixerException()
-        else:
+        if not strVal:
             return deviceId
+        devices = GetMixerDevices()
+
+        if -1 < deviceId < len(devices) - 1:
+            return devices[deviceId]
+        else:
+            # return devices[0]
+            raise SoundMixerException()
     else:
         deviceId = deviceId[:31]
         devices = GetMixerDevices(True)
-        if deviceId in devices:
-            if strVal:
-                return deviceId
-            else:
-                return devices.index(deviceId) - 1
-        else:
+        if deviceId not in devices:
             #return 0
             raise SoundMixerException()
+        if strVal:
+            return deviceId
+        else:
+            return devices.index(deviceId) - 1
 
 def GetDeviceLines(deviceId=0):
     deviceId = GetDeviceId(deviceId)
@@ -391,16 +389,14 @@ def GetMixerDevices(useList=False):
     Returns a list of all mixer device names available on the system.
     """
     mixcaps = MIXERCAPS()
-    result = []
-    # get the number of Mixer devices in this computer
-    result.append("Primary Sound Driver")
+    result = ['Primary Sound Driver']
     for i in range(mixerGetNumDevs()):
         # get info about the device
         if mixerGetDevCaps(i, byref(mixcaps), sizeof(MIXERCAPS)):
             continue
         # store the name of the device
         result.append(mixcaps.szPname)
-    return result if useList else dict((i - 1, result[i]) for i in range(len(result)))
+    return result if useList else {i - 1: result[i] for i in range(len(result))}
 
 def GetMute(deviceId=0):
     import eg

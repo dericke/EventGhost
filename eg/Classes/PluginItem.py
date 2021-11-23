@@ -64,9 +64,12 @@ class PluginItem(ActionItem):
         actionItemCls = self.document.ActionItem
 
         def SearchFunc(obj):
-            if obj.__class__ == actionItemCls:
-                if obj.executable and obj.executable.plugin == self.executable:
-                    return True
+            if (
+                obj.__class__ == actionItemCls
+                and obj.executable
+                and obj.executable.plugin == self.executable
+            ):
+                return True
             return None
 
         if self.root.Traverse(SearchFunc) is not None:
@@ -161,14 +164,13 @@ class PluginItem(ActionItem):
         plugin = self.info.instance
 
         def Traverse(item):
-            if item.__class__ == actionItemCls:
-                if item.executable.plugin == plugin:
-                    pass
-                    #eg.Notify("NodeChanged", item)
-            else:
-                if item.childs and item in item.document.expandedNodes:
-                    for child in item.childs:
-                        Traverse(child)
+            if (
+                item.__class__ != actionItemCls
+                and item.childs
+                and item in item.document.expandedNodes
+            ):
+                for child in item.childs:
+                    Traverse(child)
         Traverse(self.root)
 
     @eg.LogIt

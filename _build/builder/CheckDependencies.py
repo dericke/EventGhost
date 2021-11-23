@@ -92,15 +92,13 @@ class DllDependency(DependencyBase):
             )
         )
 
-        if len(files):
-            for file in files:
-                if GetFileVersion(file) != wantedVersion:
-                    raise WrongVersion
-                else:
-                    dest = join(self.buildSetup.sourceDir, basename(file))
-                    copy2(file, dest)
-        else:
+        if not len(files):
             raise MissingDependency
+        for file in files:
+            if GetFileVersion(file) != wantedVersion:
+                raise WrongVersion
+            dest = join(self.buildSetup.sourceDir, basename(file))
+            copy2(file, dest)
 
 
 class GitDependency(DependencyBase):
@@ -110,7 +108,7 @@ class GitDependency(DependencyBase):
     url = "https://git-scm.com/download/win"
 
     def Check(self):
-        if not (os.system('"%s" --version >NUL 2>NUL' % GetGitPath()) == 0):
+        if os.system('"%s" --version >NUL 2>NUL' % GetGitPath()) != 0:
             raise MissingDependency
 
 
@@ -359,11 +357,18 @@ def Choco(*args):
     choco = GetChocolateyPath()
     if not choco:
         try:
-            if not (StartProcess(
-                "powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
-                "-Command", "iex ((new-object net.webclient).DownloadString"
-                "('https://chocolatey.org/install.ps1'))"
-            ) == 0):
+            if (
+                StartProcess(
+                    "powershell",
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command",
+                    "iex ((new-object net.webclient).DownloadString"
+                    "('https://chocolatey.org/install.ps1'))",
+                )
+                != 0
+            ):
                 raise MissingChocolatey
         except WindowsError:
             raise MissingPowerShell

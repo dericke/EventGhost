@@ -214,9 +214,7 @@ class AddEventDialog(eg.TaskletDialog):
             path = data.path
         self.nameText.SetLabel(data.name)
         self.docText.SetBasePath(path)
-        self.docText.SetPage(
-            data.description if data.description else Text.noDescription
-        )
+        self.docText.SetPage(data.description or Text.noDescription)
 
     def OnTextEnter(self, event):
         value = event.GetString()
@@ -261,8 +259,5 @@ class EventInfo:
 
     def __init__(self, name, description, info):
         self.name = name
-        if description:
-            self.description = description
-        else:
-            self.description = ""
+        self.description = description or ""
         self.info = info

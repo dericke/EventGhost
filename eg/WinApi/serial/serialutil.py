@@ -275,12 +275,7 @@ class SerialBase(FileLike):
         """
         Change DsrDtr flow control setting.
         """
-        if dsrdtr is None:
-            #if not set, keep backwards compatibility and follow rtscts setting
-            self._dsrdtr = self._rtscts
-        else:
-            #if defined independently, follow its value
-            self._dsrdtr = dsrdtr
+        self._dsrdtr = self._rtscts if dsrdtr is None else dsrdtr
         if self._isOpen:
             self._reconfigurePort()
 
@@ -302,13 +297,12 @@ class SerialBase(FileLike):
         was_open = self._isOpen
         if was_open:
             self.close()
-        if port is not None:
-            if type(port) in [type(''), type(u'')]:       #strings are taken directly
-                self.portstr = port
-            else:
-                self.portstr = self.makeDeviceName(port)
-        else:
+        if port is None:
             self.portstr = None
+        elif type(port) in [type(''), type(u'')]:       #strings are taken directly
+            self.portstr = port
+        else:
+            self.portstr = self.makeDeviceName(port)
         self._port = port
         if was_open:
             self.open()

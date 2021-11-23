@@ -55,9 +55,8 @@ class ImagePicker(wx.Window):
         )
         if dialog.ShowModal() == wx.ID_OK:
             filePath = dialog.GetPath()
-            infile = open(filePath, "rb")
-            stream = infile.read()
-            infile.close()
+            with open(filePath, "rb") as infile:
+                stream = infile.read()
             self.SetValue(b64encode(stream))
             event.Skip()
 

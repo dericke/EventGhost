@@ -87,6 +87,5 @@ class Config(object):
                 config.add_section('Website')
         config.set('Website', "url", self.buildSetup.args.websiteUrl)
 
-        configFile = open(self._configFilePath, "w")
-        config.write(configFile)
-        configFile.close()
+        with open(self._configFilePath, "w") as configFile:
+            config.write(configFile)

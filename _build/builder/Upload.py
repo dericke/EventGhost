@@ -74,8 +74,7 @@ class ProgressFile(object):
         self.lastSecond = now
         if numBytes > 0:
             self.lastBytes = now
-        if self.rate < 0:
-            self.rate = 0
+        self.rate = max(self.rate, 0)
 
     def close(self):  #IGNORE:C0103 Invalid name "close"
         """
@@ -300,7 +299,7 @@ def UploadWithFtp(urlComponents, filename, dialog, log):
     if len(fileList):
         fileList = ftp.nlst()
     log("Creating temp name.")
-    for i in range(0, 999999):
+    for i in range(999999):
         tempFileName = "tmp%06d" % i
         if tempFileName not in fileList:
             break
@@ -349,7 +348,7 @@ def UploadWithSftp(urlComponents, filename, dialog, log):
     log("Getting directory listing...")
     fileList = client.listdir(urlComponents.path)
     log("Creating temp name.")
-    for i in range(0, 999999):
+    for i in range(999999):
         tempFileName = "tmp%06d" % i
         if tempFileName not in fileList:
             break

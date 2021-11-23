@@ -396,13 +396,13 @@ class SendKeysParser:
         sendInputStructSize = sizeof(sendInputStruct)
         keyboardStruct = sendInputStruct.ki
         for block in keyData:
-            if mode == 1 or mode == 2:
+            if mode in [1, 2]:
                 keyboardStruct.dwFlags = 0
                 for virtualKey in block:
                     keyboardStruct.wVk = virtualKey & 0xFF
                     SendInput(1, sendInputStructPointer, sendInputStructSize)
                     self.WaitForInputProcessed()
-            if mode == 0 or mode == 2:
+            if mode in [0, 2]:
                 keyboardStruct.dwFlags = KEYEVENTF_KEYUP
                 for virtualKey in reversed(block):
                     keyboardStruct.wVk = virtualKey & 0xFF
@@ -416,7 +416,7 @@ class SendKeysParser:
         """
         keyboardStateBuffer = self.keyboardStateBuffer
         for block in keyData:
-            if mode == 1 or mode == 2:
+            if mode in [1, 2]:
                 for virtualKey in block:
                     keyCode = virtualKey & 0xFF
                     highBits = virtualKey & 0xFF00
@@ -441,7 +441,7 @@ class SendKeysParser:
                     PostMessage(hwnd, mesg, keyCode, lparam)
                     self.WaitForInputProcessed()
 
-            if mode == 0 or mode == 2:
+            if mode in [0, 2]:
                 for virtualKey in reversed(block):
                     keyCode = virtualKey & 0xFF
                     highBits = virtualKey & 0xFF00

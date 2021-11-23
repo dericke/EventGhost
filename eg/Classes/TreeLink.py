@@ -63,16 +63,15 @@ class TreeLink(object):
 
     @classmethod
     def NewXmlId(cls, xmlId, obj):
-        if TreeLink.inUndo:
-            if xmlId != -1:
-                cls.id2target[xmlId] = obj
-                if xmlId in cls.unresolvedIds:
-                    obj.dependants = cls.unresolvedIds[xmlId]
-                    for link in obj.dependants:
-                        link.target = obj
-                        if link.owner:
-                            link.owner.Refresh()
-                return xmlId
+        if TreeLink.inUndo and xmlId != -1:
+            cls.id2target[xmlId] = obj
+            if xmlId in cls.unresolvedIds:
+                obj.dependants = cls.unresolvedIds[xmlId]
+                for link in obj.dependants:
+                    link.target = obj
+                    if link.owner:
+                        link.owner.Refresh()
+            return xmlId
         if xmlId != -1:
             cls.sessionId2target[xmlId] = obj
         cls.currentXmlId += 1

@@ -58,8 +58,9 @@ class ConfigPanel(wx.PyPanel, eg.ControlProviderMixin):
             has_args and self.dialog.treeItem.isFirstConfigure
         )
         self.dialog.buttonRow.okButton.Enable(
-            not has_args or
-            not (has_args and self.dialog.treeItem.isFirstConfigure)
+            not has_args
+            or not has_args
+            or not self.dialog.treeItem.isFirstConfigure
         )
 
     def AddCtrl(self, ctrl):

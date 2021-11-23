@@ -121,9 +121,7 @@ def RecursivePySave(obj, fileWriter, indent=""):
         if key.startswith("_"):
             continue
         value = objDict[key]
-        if type(value) == ClassType:
-            classKeys.append(key)
-        elif type(value) == InstanceType:
+        if type(value) in [ClassType, InstanceType]:
             classKeys.append(key)
         else:
             line = indent + key + " = " + repr(value) + "\n"

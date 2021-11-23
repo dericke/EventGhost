@@ -36,7 +36,7 @@ class Sony(IrProtocolBase):
             if space < 400:
                 raise DecodeError("space too short %d" % space)
             if space > 900:
-                if i in (25, 31, 41):
+                if i in {25, 31, 41}:
                     break
                 raise DecodeError("space too long %d" % space)
 

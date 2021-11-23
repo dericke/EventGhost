@@ -156,8 +156,7 @@ Dynamic.FormatError = FormatError
 def GetAlwaysOnTop(hwnd = None):
     hwnd = GetBestHwnd(hwnd)
     style = GetWindowLong(hwnd, GWL_EXSTYLE)
-    isAlwaysOnTop = (style & WS_EX_TOPMOST) != 0
-    return isAlwaysOnTop
+    return (style & WS_EX_TOPMOST) != 0
 
 def GetBestHwnd(hwnd = None):
     if isinstance(hwnd, int):
@@ -276,10 +275,15 @@ def GetPids(processName = None, hwnd = None):
         return False
 
     try:
-        pids = []
-        for proc in GetObject("winmgmts:").ExecQuery("SELECT * FROM Win32_Process WHERE Name = '" + str(processName.replace("'", "\\'")) + "'"):
-            pids.append(proc.ProcessID)
-        return pids
+        return [
+            proc.ProcessID
+            for proc in GetObject("winmgmts:").ExecQuery(
+                "SELECT * FROM Win32_Process WHERE Name = '"
+                + str(processName.replace("'", "\\'"))
+                + "'"
+            )
+        ]
+
     except:
         return False
 

@@ -79,20 +79,19 @@ class BuildStaticImports(builder.Task):
 
     def DoTask(self):
         outDir = join(self.buildSetup.sourceDir, "eg")
-        outfile = open(self.outFileName, "w")
-        outfile.write(HEADER)
-        outfile.write("# py" + "lint: disable-msg=W0611,W0614,C0103\n")
-        outfile.write("import eg\n")
-        outfile.write("from Utils import * #py" + "lint: disable-msg=W0401\n")
-        ScanDir(outDir, outfile, "Classes")
-        ScanDir(outDir, outfile, "Classes.MainFrame")
-        ScanDir(outDir, outfile, "Classes.UndoHandler")
-        outfile.write("\n")
-        for name in SINGLETONS:
-            clsName = name[0].upper() + name[1:]
-            outfile.write("%s = %s()\n" % (name, clsName))
-        outfile.write(FOOTER)
-        outfile.close()
+        with open(self.outFileName, "w") as outfile:
+            outfile.write(HEADER)
+            outfile.write("# py" + "lint: disable-msg=W0611,W0614,C0103\n")
+            outfile.write("import eg\n")
+            outfile.write("from Utils import * #py" + "lint: disable-msg=W0401\n")
+            ScanDir(outDir, outfile, "Classes")
+            ScanDir(outDir, outfile, "Classes.MainFrame")
+            ScanDir(outDir, outfile, "Classes.UndoHandler")
+            outfile.write("\n")
+            for name in SINGLETONS:
+                clsName = name[0].upper() + name[1:]
+                outfile.write("%s = %s()\n" % (name, clsName))
+            outfile.write(FOOTER)
 
 
 def ScanDir(srcDir, outfile, modName):

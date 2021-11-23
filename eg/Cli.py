@@ -118,14 +118,14 @@ if args.isMain:
 
         if arg in ('-e', '-event'):
             eventstring = str(argvIter.next())
-            payloads = list()
+            payloads = []
             for payload in argvIter:
                 if payload.startswith('-'):
                     arg = payload
                     break
                 payloads.append(payload)
 
-            if len(payloads) == 0:
+            if not payloads:
                 payloads = None
 
             if '.' not in eventstring:
@@ -133,7 +133,7 @@ if args.isMain:
                 suffix = eventstring
             else:
                 prefix, suffix = eventstring.split('.', 1)
-            
+
             args.startupEvent = (
                 suffix,
                 payloads,
@@ -180,44 +180,44 @@ if args.isMain:
                 args.pluginFile = path
             elif ext in (".egtree", ".xml"):
                 args.startupFile = path
-    if (
-        not args.allowMultiLoad and
-        not args.translate and
-        args.isMain # and
-        # not args.pluginFile
-    ):
+if (
+    not args.allowMultiLoad and
+    not args.translate and
+    args.isMain # and
+    # not args.pluginFile
+):
 
-        no_count = 0
+    no_count = 0
 
-        if LoopbackSocket.is_eg_running():
-            if args.startupFile:
-                send_message('eg.document.Open', args.startupFile)
-            else:
-                no_count += 1
-            if args.startupEvent:
-                send_message('eg.TriggerEvent', *args.startupEvent)
-            else:
-                no_count += 1
-            if args.pluginFile:
-                send_message('eg.PluginInstall.Import', args.pluginFile)
-            else:
-                no_count += 1
-            if args.hideOnStartup:
-                send_message('eg.document.HideFrame')
-            else:
-                no_count += 1
+    if LoopbackSocket.is_eg_running():
+        if args.startupFile:
+            send_message('eg.document.Open', args.startupFile)
+        else:
+            no_count += 1
+        if args.startupEvent:
+            send_message('eg.TriggerEvent', *args.startupEvent)
+        else:
+            no_count += 1
+        if args.pluginFile:
+            send_message('eg.PluginInstall.Import', args.pluginFile)
+        else:
+            no_count += 1
+        if args.hideOnStartup:
+            send_message('eg.document.HideFrame')
+        else:
+            no_count += 1
 
-            if no_count == 4:
-                send_message('eg.document.ShowFrame')
+        if no_count == 4:
+            send_message('eg.document.ShowFrame')
 
-            if args.restart:
-                restart()
+        if args.restart:
+            restart()
 
-            else:
-                sys.exit(0)
+        else:
+            sys.exit(0)
 
-        appMutex = ctypes.windll.kernel32.CreateMutexA(
-            None,
-            0,
-            "Global\\EventGhost:7EB106DC-468D-4345-9CFE-B0021039114B"
-        )
+    appMutex = ctypes.windll.kernel32.CreateMutexA(
+        None,
+        0,
+        "Global\\EventGhost:7EB106DC-468D-4345-9CFE-B0021039114B"
+    )

@@ -28,27 +28,6 @@ MODES = {
 class Rcmm(IrProtocolBase):
     def Decode(self, data):
         raise DecodeError("not implemented")
-        if not (200 < data[0] < 600):
-            DecodeError("wrong header pulse")
-        if not (100 < data[1] < 500):
-            DecodeError("wrong header pause")
-        self.pos = 2
-        self.data = data
-        mode = self.GetBits()
-        if mode != 0:
-            addr = self.GetBits()
-            data = self.ShiftInBits(4)
-            return "RC-MM.%s.%X.%04X" % (MODES[mode], addr, data)
-        mode = self.GetBits()
-        if mode != 0:
-            data = self.ShiftInBits(10)
-            return "RC-MM.Ex%s.%06X" % (MODES[mode], data)
-        mode = self.GetBits()
-        if mode != 3:
-            raise DecodeError("wrong OEM mode")
-        customerId = self.ShiftInBits(3)
-        data = self.ShiftInBits(6)
-        return "RC-MM.Oem%02X.%04X" % (customerId, data)
 
     def GetBits(self):
         if 66 > self.data[self.pos] > 266:
@@ -68,7 +47,7 @@ class Rcmm(IrProtocolBase):
 
     def ShiftInBits(self, numBits):
         data = 0
-        for dummyCounter in xrange(numBits):
+        for _ in xrange(numBits):
             data <<= 2
             data |= self.GetBits()
         return data

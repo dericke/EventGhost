@@ -320,10 +320,9 @@ class ChangelogPanel(HtmlPanel):
         eg.configDir to speed up loading.
         """
         text = eg.Utils.DecodeMarkdown(text)
-        changelogDatFile = open(changelogDatPath, "wt")
-        changelogDatFile.write(digest + "\n")
-        changelogDatFile.write(text)
-        changelogDatFile.close()
+        with open(changelogDatPath, "wt") as changelogDatFile:
+            changelogDatFile.write(digest + "\n")
+            changelogDatFile.write(text)
         return text
 
 
@@ -334,14 +333,13 @@ def GetCpuName():
     )
     if name:
         return name
-    else:
-        id = GetRegistryValue(
-            r"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0",
-            "Identifier")
-        vendor = GetRegistryValue(
-            r"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0",
-            "VendorIdentifier")
-        return "%s, %s" % (id, vendor)
+    id = GetRegistryValue(
+        r"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0",
+        "Identifier")
+    vendor = GetRegistryValue(
+        r"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0",
+        "VendorIdentifier")
+    return "%s, %s" % (id, vendor)
 
 def GetPluginAuthors():
     """

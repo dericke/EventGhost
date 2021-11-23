@@ -169,13 +169,12 @@ class Log(object):
         """
         payload = event.payload
         eventstring = event.string
-        if payload is not None:
-            if type(payload) == UnicodeType:
-                mesg = eventstring + ' u"' + payload + '"'
-            else:
-                mesg = eventstring + ' ' + repr(payload)
-        else:
+        if payload is None:
             mesg = eventstring
+        elif type(payload) == UnicodeType:
+            mesg = eventstring + ' u"' + payload + '"'
+        else:
+            mesg = eventstring + ' ' + repr(payload)
         self.Write(mesg + "\n", eg.EventItem.icon, eventstring)
 
     def NativeLogOn(self, value):
@@ -263,10 +262,7 @@ class Log(object):
             self.logListeners.remove(listener)
 
     def SetCtrl(self, logCtrl):
-        if logCtrl is not None:
-            self.ctrl = logCtrl
-        else:
-            self.ctrl = DummyLogCtrl()
+        self.ctrl = logCtrl if logCtrl is not None else DummyLogCtrl()
 
     def Write(self, text, icon, wRef=None):
         try:

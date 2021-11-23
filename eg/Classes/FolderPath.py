@@ -36,15 +36,12 @@ CSIDL_FLAG_DONT_VERIFY = 16384
 
 CSIDL = {
     'AdminTools': 48,
-    'Startup': 29,
     'RoamingAppData': 26,
     'CDBurning': 59,
     'CommonAdminTools': 47,
-    'CommonStartup': 30,
     'ProgramData': 35,
     'PublicDesktop': 25,
     'PublicDocuments': 46,
-    'Favorites': 31,
     'PublicMusic': 53,
     'CommonOEMLinks': 58,
     'PublicPictures': 54,
@@ -60,7 +57,6 @@ CSIDL = {
     'History': 34,
     'InternetCache': 32,
     'LocalAppData': 28,
-    'Documents': 12,
     'Music': 13,
     'Pictures': 39,
     'Videos': 14,
@@ -80,6 +76,7 @@ CSIDL = {
     'Templates': 21,
     'Windows': 36,
 }
+
 
 BUFFER = create_unicode_buffer(MAX_PATH)
 GetTempPathW(MAX_PATH, BUFFER)

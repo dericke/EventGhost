@@ -136,7 +136,7 @@ class ManchesterBase(IrProtocolBase):
         """
         data = 0
         mask = 1
-        for dummyCounter in range(numBits):
+        for _ in range(numBits):
             data |= mask * self.GetBit()
             mask <<= 1
         return data
@@ -146,7 +146,7 @@ class ManchesterBase(IrProtocolBase):
         Returns numBits count manchester bits with LSB last order.
         """
         data = 0
-        for dummyCounter in range(numBits):
+        for _ in range(numBits):
             data <<= 1
             data |= self.GetBit()
         return data
@@ -208,7 +208,7 @@ class ManchesterCoding2(ManchesterBase):
 
 def GetBitString(value, numdigits=8):
     digits = []
-    for dummyCounter in range(numdigits):
+    for _ in range(numdigits):
         if value & 1:
             digits.append("1")
         else:

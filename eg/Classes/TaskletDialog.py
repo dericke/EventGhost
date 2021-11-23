@@ -88,20 +88,17 @@ class TaskletDialog(wx.Dialog, eg.ControlProviderMixin):
             if eventId == wx.ID_CANCEL:
                 self.__lastEventId = False
                 self.EndModal(wx.ID_CANCEL)
-            if not self.__tasklet.blocked:
-                self.__tasklet.run()
-            else:
+            if self.__tasklet.blocked:
                 self.__processingChannel.receive()
-                self.__tasklet.run()
+            self.__tasklet.run()
+        elif eventId == wx.ID_CANCEL:
+            self.__processingChannel.send(False)
+        elif eventId == wx.ID_OK:
+            self.__processingChannel.send(wx.ID_OK)
+            if self.__done:
+                self.__processingChannel.send(None)
         else:
-            if eventId == wx.ID_CANCEL:
-                self.__processingChannel.send(False)
-            elif eventId == wx.ID_OK:
-                self.__processingChannel.send(wx.ID_OK)
-                if self.__done:
-                    self.__processingChannel.send(None)
-            else:
-                self.__processingChannel.send(eventId)
+            self.__processingChannel.send(eventId)
 
     @eg.LogIt
     def FinishSetup(self):

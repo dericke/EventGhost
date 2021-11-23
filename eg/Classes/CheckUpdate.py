@@ -141,12 +141,11 @@ def _checkUpdate(manually=False):
         rc, data = gh.repos["EventGhost"]["EventGhost"].releases.get()
         if rc == 200:
             for rel in data:
-                if rel["prerelease"]:
-                    if eg.config.checkPreRelease or "-" in eg.Version.string:
-                        break
-                else:
+                if not rel["prerelease"]:
                     break
 
+                if eg.config.checkPreRelease or "-" in eg.Version.string:
+                    break
         if dialog:
             dialog.Destroy()
             dialog = None
@@ -161,16 +160,15 @@ def _checkUpdate(manually=False):
         ):
             eg.config.lastUpdateCheckVersion = ver
             wx.CallAfter(MessageDialog, ver, url)
-        else:
-            if manually:
-                dlg = wx.MessageDialog(
-                    None,
-                    Text.ManOkMesg,
-                    eg.APP_NAME,
-                    style=wx.OK | wx.ICON_INFORMATION
-                )
-                dlg.ShowModal()
-                dlg.Destroy()
+        elif manually:
+            dlg = wx.MessageDialog(
+                None,
+                Text.ManOkMesg,
+                eg.APP_NAME,
+                style=wx.OK | wx.ICON_INFORMATION
+            )
+            dlg.ShowModal()
+            dlg.Destroy()
     except:
         if dialog:
             dialog.Destroy()

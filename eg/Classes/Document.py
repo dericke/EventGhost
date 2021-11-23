@@ -302,21 +302,20 @@ class Document(object):
         # TODO: Find a better way. Preferable detect the minimize option
         #       before we create the MainFrame.
         if self.reentrantLock.acquire(False):
-            if self.frame is not None:
-                if len(self.frame.openDialogs) == 0:
-                    logCtrl = self.frame.logCtrl
-                    if logCtrl.IsAutoscroll():
-                        self.visibleLogItem = 0
-                    else:
-                        self.visibleLogItem = (
-                            logCtrl.GetTopItem() + logCtrl.GetCountPerPage()
-                        )
+            if self.frame is not None and len(self.frame.openDialogs) == 0:
+                logCtrl = self.frame.logCtrl
+                if logCtrl.IsAutoscroll():
+                    self.visibleLogItem = 0
+                else:
+                    self.visibleLogItem = (
+                        logCtrl.GetTopItem() + logCtrl.GetCountPerPage()
+                    )
 
-                        if self.visibleLogItem:
-                            self.visibleLogItem -= 1
+                    if self.visibleLogItem:
+                        self.visibleLogItem -= 1
 
-                    self.frame.Destroy()
-                    self.frame = eg.mainFrame = None
+                self.frame.Destroy()
+                self.frame = eg.mainFrame = None
             self.reentrantLock.release()
         else:
             wx.CallLater(100, self.HideFrame)

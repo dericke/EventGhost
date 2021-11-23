@@ -47,14 +47,9 @@ class Display(object):
         devMode.dmSize = sizeof(DEVMODE)
         lpDevMode = pointer(devMode)
         modes = {}
-        if allModes:
-            flag = EDS_RAWMODE
-        else:
-            flag = 0
+        flag = EDS_RAWMODE if allModes else 0
         iModeNum = 0
-        while 0 != EnumDisplaySettingsEx(
-            self.deviceName, iModeNum, lpDevMode, flag
-        ):
+        while EnumDisplaySettingsEx(self.deviceName, iModeNum, lpDevMode, flag) != 0:
             iModeNum += 1
             resolution = (devMode.dmPelsWidth, devMode.dmPelsHeight)
             deepthDict = modes.setdefault(resolution, {})

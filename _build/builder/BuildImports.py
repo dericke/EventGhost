@@ -202,9 +202,9 @@ def GetPackageModules(package):
         moduleList.append(package)
         if hasattr(mod, "__path__"):
             paths = mod.__path__
+        elif mod.__file__.endswith(".pyd"):
+            return moduleList
         else:
-            if mod.__file__.endswith(".pyd"):
-                return moduleList
             paths = [os.path.dirname(mod.__file__)]
         for path in paths:
             moduleList.extend(FindModulesInPath(path, package))
@@ -228,32 +228,33 @@ def ReadGlobalModuleIndex(infile):
     """
     modules = []
     badModules = []
-    inFile = open(infile, "r")
-    for line in inFile.readlines():
-        if line.startswith("#"):
-            continue
-        parts = line.strip().split(" ", 1)
-        if len(parts) > 1:
-            if parts[1].startswith("(") and parts[1].find("Windows") < 0:
+    with open(infile, "r") as inFile:
+        for line in inFile.readlines():
+            if line.startswith("#"):
+                continue
+            parts = line.strip().split(" ", 1)
+            if (
+                len(parts) > 1
+                and parts[1].startswith("(")
+                and parts[1].find("Windows") < 0
+            ):
                 badModules.append(parts[0])
                 continue
 #            if parts[1].find("Deprecated:") >= 0:
 #                print line
-        modules.append(parts[0])
-    inFile.close()
+            modules.append(parts[0])
     return modules, badModules
 
 def ReadPth(path):
     """
     Read a .PTH file and return the paths inside as a list
     """
-    result = []
     pthFile = open(path, "rt")
-    for line in pthFile:
-        if line.strip().startswith("#"):
-            continue
-        result.append(join(os.path.dirname(path), line.strip()))
-    return result
+    return [
+        join(os.path.dirname(path), line.strip())
+        for line in pthFile
+        if not line.strip().startswith("#")
+    ]
 
 def ShouldBeIgnored(moduleName):
     """

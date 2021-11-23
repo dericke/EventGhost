@@ -67,7 +67,7 @@ class ControlProviderMixin:
         return eg.DisplayChoice(self, value, *args, **kwargs)
 
     def FileBrowseButton(self, value, **kwargs):
-        filepathCtrl = eg.FileBrowseButton(
+        return eg.FileBrowseButton(
             self,
             size=(320, -1),
             initialValue=value,
@@ -75,7 +75,6 @@ class ControlProviderMixin:
             buttonText=eg.text.General.browse,
             **kwargs
         )
-        return filepathCtrl
 
     def FontSelectButton(self, value=None, *args, **kwargs):
         fontCtrl = eg.FontSelectButton(self)

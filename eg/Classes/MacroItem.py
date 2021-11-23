@@ -36,18 +36,19 @@ class MacroItem(ContainerItem):
     }
 
     def Execute(self):
-        if self.isEnabled:
-            del eg.lastFoundWindows[:]
-            if eg.config.logMacros:
-                self.Print(self.name)
-            if self.shouldSelectOnExecute:
-                wx.CallAfter(self.Select)
+        if not self.isEnabled:
+            return
+        del eg.lastFoundWindows[:]
+        if eg.config.logMacros:
+            self.Print(self.name)
+        if self.shouldSelectOnExecute:
+            wx.CallAfter(self.Select)
 
-            if self.childs:
-                eg.indent += 1
-                eg.programCounter = (self.childs[0], 0)
-            else:
-                eg.programCounter = None
+        if self.childs:
+            eg.indent += 1
+            eg.programCounter = (self.childs[0], 0)
+        else:
+            eg.programCounter = None
 
     def GetNextChild(self, index):
         index += 1

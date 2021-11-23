@@ -349,10 +349,9 @@ def GetFuncArgString(func, args, kwargs):
     classname = ""
     argnames = inspect.getargspec(func)[0]
     start = 0
-    if argnames:
-        if argnames[0] == "self":
-            classname = args[0].__class__.__name__ + "."
-            start = 1
+    if argnames and argnames[0] == "self":
+        classname = args[0].__class__.__name__ + "."
+        start = 1
     res = []
     append = res.append
     for key, value in zip(argnames, args)[start:]:
@@ -477,9 +476,7 @@ def ParseString(text, filterFunc=None):
             if end == -1:
                 raise SyntaxError("unmatched bracket")
             word = text[start:end]
-            res = None
-            if filterFunc:
-                res = filterFunc(word)
+            res = filterFunc(word) if filterFunc else None
             if res is None:
                 res = eval(word, {}, eg.globals.__dict__)
             chunks.append(unicode(res))

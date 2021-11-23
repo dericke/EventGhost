@@ -122,8 +122,7 @@ class Popen(subprocess.Popen):
 
 
 def recv_some(p, t=.1, e=1, tr=5, stderr=0):
-    if tr < 1:
-        tr = 1
+    tr = max(tr, 1)
     x = time.time() + t
     y = []
     r = ''

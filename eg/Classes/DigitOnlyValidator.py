@@ -60,8 +60,4 @@ class DigitOnlyValidator(wx.PyValidator):
             except:
                 pass
 
-        for x in val:
-            if x not in string.digits:
-                return False
-
-        return True
+        return all(x in string.digits for x in val)

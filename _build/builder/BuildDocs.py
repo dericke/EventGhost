@@ -168,14 +168,11 @@ def GetFirstTextParagraph(text):
 
 def Prepare(doc_src_dir):
     filepath = join(doc_src_dir, "eg", "classes.txt")
-    outfile = open(filepath, "wt")
-    outfile.write(BuildClsDocs(MAIN_CLASSES, doc_src_dir) + '\n')
-    outfile.close()
-
+    with open(filepath, "wt") as outfile:
+        outfile.write(BuildClsDocs(MAIN_CLASSES, doc_src_dir) + '\n')
     filepath = join(doc_src_dir, "eg", "gui_classes.txt")
-    outfile = open(filepath, "wt")
-    outfile.write(BuildClsDocs(GUI_CLASSES, doc_src_dir) + '\n')
-    outfile.close()
+    with open(filepath, "wt") as outfile:
+        outfile.write(BuildClsDocs(GUI_CLASSES, doc_src_dir) + '\n')
 
 
 def WritePluginList(filepath):

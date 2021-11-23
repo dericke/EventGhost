@@ -92,13 +92,13 @@ class SpinNumCtrl(wx.Window):
             if value < 0:
                 raise NegativeValueError
 
-        elif min_val is None and max_val is not None:
+        elif min_val is None:
             if value > max_val:
                 raise MaxValueError(value, max_val)
             if max_val < 0:
                 allow_negative = True
 
-        elif max_val is None and min_val is not None:
+        elif max_val is None:
             if value < min_val:
                 raise MinValueError(value, min_val)
             if min_val < 0:

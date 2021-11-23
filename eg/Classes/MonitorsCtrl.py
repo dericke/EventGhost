@@ -76,9 +76,7 @@ class MonsListCtrl(wx.ListCtrl):
         self.SetSize(size)
 
     def GetRealSize(self):
-        w = 0
-        for i in range(self.GetColumnCount()):
-            w += self.GetColumnWidth(i)
+        w = sum(self.GetColumnWidth(i) for i in range(self.GetColumnCount()))
         border = self.GetWindowBorderSize()
         w += border[0]
         return (w, self.hh + border[1] + self.GetItemCount() * self.ih)

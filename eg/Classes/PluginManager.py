@@ -30,10 +30,9 @@ class PluginManager:
     def GetPluginInfo(self, ident):
         if ident in self.database:
             return self.database[ident]
-        else:
-            for guid, info in self.database.iteritems():
-                if info.pluginName == ident:
-                    return info
+        for guid, info in self.database.iteritems():
+            if info.pluginName == ident:
+                return info
         return None
 
     def GetPluginInfoList(self):

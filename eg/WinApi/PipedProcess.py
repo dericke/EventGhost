@@ -197,10 +197,7 @@ def RunAs(filePath, asAdministrator, *args):
     sei.fMask = (
         SEE_MASK_FLAG_DDEWAIT | SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS
     )
-    if asAdministrator:
-        sei.lpVerb = u"runas"
-    else:
-        sei.lpVerb = u""
+    sei.lpVerb = u"runas" if asAdministrator else u""
     sei.lpFile = GetUncPathOf(filePath)
     sei.lpParameters = " ".join(
         ['"%s"' % arg.replace('"', '""') for arg in args]

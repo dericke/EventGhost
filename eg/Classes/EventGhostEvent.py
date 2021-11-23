@@ -133,12 +133,11 @@ class EventGhostEvent(object):
                     break
                 obj = obj.parent
             else:
-                activeHandlers.add(eventHandler)
-
+                activeHandlers.add(obj)
         for listener in eg.log.eventListeners:
             listener.LogEvent(self)
 
-        if config.onlyLogAssigned and len(activeHandlers) == 0:
+        if config.onlyLogAssigned and not activeHandlers:
             self.SetStarted()
             return
 

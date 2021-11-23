@@ -59,15 +59,14 @@ class AddPluginDialog(eg.TaskletDialog):
             return True
         if info.canMultiLoad:
             return True
-        if any((plugin.info.path == info.path) for plugin in eg.pluginList):
-            eg.MessageBox(
-                Text.noMultiload,
-                Text.noMultiloadTitle,
-                style=wx.ICON_EXCLAMATION
-            )
-            return False
-        else:
+        if all(plugin.info.path != info.path for plugin in eg.pluginList):
             return True
+        eg.MessageBox(
+            Text.noMultiload,
+            Text.noMultiloadTitle,
+            style=wx.ICON_EXCLAMATION
+        )
+        return False
 
     @eg.LogItWithReturn
     def Configure(self, parent, checkMultiLoad=True, title=None):
@@ -235,9 +234,8 @@ class AddPluginDialog(eg.TaskletDialog):
             stop_x = start_x + 20
             stop_y = stary_y + 20
 
-            if stop_x > x > start_x and stop_y > y > stary_y:
-                if not self.click_count:
-                    self.CaptureMouse()
+            if stop_x > x > start_x and stop_y > y > stary_y and not self.click_count:
+                self.CaptureMouse()
 
             start_x = 0
             stary_y = height - 20
@@ -245,9 +243,8 @@ class AddPluginDialog(eg.TaskletDialog):
             stop_x = start_x + 20
             stop_y = stary_y + 20
 
-            if stop_x > x > start_x and stop_y > y > stary_y:
-                if self.click_count:
-                    self.CaptureMouse()
+            if stop_x > x > start_x and stop_y > y > stary_y and self.click_count:
+                self.CaptureMouse()
 
             evt.Skip()
 

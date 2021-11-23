@@ -126,7 +126,7 @@ class App(wx.App):
                     thread.isAlive()
                 )
             ]
-            if len(threads) == 0:
+            if not threads:
                 break
             waitTime = time.clock() - startTime
             if waitTime > 5.0:

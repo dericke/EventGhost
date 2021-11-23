@@ -139,13 +139,12 @@ def GetWindowsVersionString():
         if minor_version == 0:
             if osvi.wProductType == VER_NT_WORKSTATION:
                 name = "2000 Professional"
+            elif suiteMask & VER_SUITE_DATACENTER:
+                name = "2000 Datacenter Server"
+            elif suiteMask & VER_SUITE_ENTERPRISE:
+                name = "2000 Advanced Server"
             else:
-                if suiteMask & VER_SUITE_DATACENTER:
-                    name = "2000 Datacenter Server"
-                elif suiteMask & VER_SUITE_ENTERPRISE:
-                    name = "2000 Advanced Server"
-                else:
-                    name = "2000 Server"
+                name = "2000 Server"
         elif minor_version == 1:
             if GetSystemMetrics(SM_MEDIACENTER):
                 name = "XP Media Center Edition"

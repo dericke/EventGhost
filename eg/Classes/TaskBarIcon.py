@@ -116,11 +116,10 @@ class TaskBarIcon(wx.TaskBarIcon):
                     return
             elif state == 1:
                 self.processingEvent = None
-                if event.shouldEnd.isSet():
-                    self.currentEvent = None
-                    state = 0
-                else:
+                if not event.shouldEnd.isSet():
                     return
+                self.currentEvent = None
+                state = 0
             elif state == 2:
                 self.currentEvent = event
                 self.processingEvent = event

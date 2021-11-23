@@ -41,10 +41,7 @@ class Environment:
 
     @staticmethod
     def AppendPath(val):
-        if os.environ.get("PATH"):
-            path = os.environ["PATH"] + os.pathsep + val
-        else:
-            path = val
+        path = os.environ["PATH"] + os.pathsep + val if os.environ.get("PATH") else val
         Environment.Set("PATH", path)
 
     @staticmethod

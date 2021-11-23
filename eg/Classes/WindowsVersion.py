@@ -35,11 +35,7 @@ WINDOWS_VERSIONS["10"] = [10, 0]
 
 
 def _compare(opp, other):
-    if isinstance(other, int):
-        other = str(other)
-    else:
-        other = other.upper()
-
+    other = str(other) if isinstance(other, int) else other.upper()
     if other not in WINDOWS_VERSIONS.keys():
         raise WindowsVersionError(other)
 
@@ -50,18 +46,18 @@ def _compare(opp, other):
     if other not in ("8", "XP"):
         versions = [versions]
 
-    if opp == '>':
-        return any(this > version for version in versions)
+    if opp == '!=':
+        return any(this != version for version in versions)
     elif opp == '<':
         return any(this < version for version in versions)
     elif opp == '<=':
         return any(this <= version for version in versions)
-    elif opp == '>=':
-        return any(this >= version for version in versions)
     elif opp == '==':
         return any(this == version for version in versions)
-    elif opp == '!=':
-        return any(this != version for version in versions)
+    elif opp == '>':
+        return any(this > version for version in versions)
+    elif opp == '>=':
+        return any(this >= version for version in versions)
 
 
 class WindowsVersionError(Exception):

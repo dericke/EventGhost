@@ -37,10 +37,8 @@ class WindowList(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
         self.InsertColumn(2, "Class")
         self.InsertColumn(3, "Handle", wx.LIST_FORMAT_RIGHT)
         for hwnd in hwnds:
-            imageIdx = 0
             icon = GetHwndIcon(hwnd)
-            if icon:
-                imageIdx = imageList.AddIcon(icon)
+            imageIdx = imageList.AddIcon(icon) if icon else 0
             idx = self.InsertImageStringItem(
                 sys.maxint,
                 GetWindowProcessName(hwnd),

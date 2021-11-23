@@ -91,11 +91,10 @@ def IsDomainAdmin():
 
     if Domain() == platform.node():
         return False
-    else:
-        try:
-            return 'Administrators' in Groups(server=Domain())
-        except win32net.error as err:
-            if err[0] == 1722:
-                return False
-            else:
-                raise
+    try:
+        return 'Administrators' in Groups(server=Domain())
+    except win32net.error as err:
+        if err[0] == 1722:
+            return False
+        else:
+            raise

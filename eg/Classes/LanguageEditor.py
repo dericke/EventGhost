@@ -189,10 +189,7 @@ class LanguageEditor(wx.Frame):
     def FillTree(self, treeId, node, evalPath=""):
         tree = self.tree
         for key, value in self.SortItems(node):
-            if evalPath == "":
-                newEvalPath = key
-            else:
-                newEvalPath = evalPath + "." + key
+            newEvalPath = key if evalPath == "" else evalPath + "." + key
             if type(value) in (types.ClassType, types.InstanceType):
                 newId = tree.AppendItem(treeId, ExpandKeyname(key), 2)
                 value = getattr(node, key)

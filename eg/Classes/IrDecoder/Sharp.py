@@ -42,9 +42,9 @@ class Sharp(IrProtocolBase):
                 pass
             elif space < 2100:
                 buf |= 1
+            elif i == 15:
+                break
             else:
-                if i == 15:
-                    break
                 raise DecodeError("space too long")
             buf <<= 1
         else:

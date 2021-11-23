@@ -51,10 +51,11 @@ class EventThread(ThreadWorker):
     def Poll(self):
         if eg.config.limitMemory and eg.document.frame is None:
             try:
-                if 0 == SetProcessWorkingSetSize(
-                    self.hHandle,
-                    3670016,
-                    eg.config.limitMemorySize * 1048576
+                if (
+                    SetProcessWorkingSetSize(
+                        self.hHandle, 3670016, eg.config.limitMemorySize * 1048576
+                    )
+                    == 0
                 ):
                     #TODO: what to do here?
                     eg.PrintDebugNotice(FormatError())

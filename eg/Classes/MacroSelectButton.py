@@ -27,10 +27,7 @@ class MacroSelectButton(wx.Window):
             treeLink = eg.TreeLink(eg.Utils.GetTopLevelWindow(parent).treeItem)
         self.treeLink = treeLink
         self.macro = treeLink.target
-        if self.macro is None:
-            macroName = ""
-        else:
-            macroName = self.macro.name
+        macroName = "" if self.macro is None else self.macro.name
         self.title = title
         self.mesg = mesg
         wx.Window.__init__(self, parent, -1)

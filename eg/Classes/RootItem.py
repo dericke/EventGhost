@@ -72,10 +72,12 @@ class RootItem(ContainerItem):
         from comtypes import GUID
         self.guid = str(GUID.create_new())
         self.time = str(time.time())
-        attr = []
-        attr.append(('Version', str(eg.Version.string)))
-        attr.append(('Guid', self.guid))
-        attr.append(('Time', self.time))
+        attr = [
+            ('Version', str(eg.Version.string)),
+            ('Guid', self.guid),
+            ('Time', self.time),
+        ]
+
         return attr, None
 
     def WriteXmlChilds(self, streamWriter, indent):

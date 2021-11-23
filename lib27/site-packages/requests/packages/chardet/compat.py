@@ -21,10 +21,7 @@
 import sys
 
 
-if sys.version_info < (3, 0):
-    base_str = (str, unicode)
-else:
-    base_str = (bytes, str)
+base_str = (str, unicode) if sys.version_info < (3, 0) else (bytes, str)
 
 
 def wrap_ord(a):

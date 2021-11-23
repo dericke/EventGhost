@@ -52,9 +52,10 @@ class NewAction(NewItem):
         )
         item.Select()
 
-        if item.NeedsStartupConfiguration():
-            if not document.CmdConfigure(item, True):
-                eg.actionThread.Call(item.Delete)
-                return None
+        if item.NeedsStartupConfiguration() and not document.CmdConfigure(
+            item, True
+        ):
+            eg.actionThread.Call(item.Delete)
+            return None
         self.StoreItem(item)
         return item

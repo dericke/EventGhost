@@ -38,10 +38,12 @@ class NewPlugin(NewItem):
         )
         pluginItem.Select()
         if pluginItem.executable:
-            if pluginItem.NeedsStartupConfiguration():
-                if not eg.UndoHandler.Configure(document).Do(pluginItem, True):
-                    eg.actionThread.Call(pluginItem.Delete)
-                    return None
+            if (
+                pluginItem.NeedsStartupConfiguration()
+                and not eg.UndoHandler.Configure(document).Do(pluginItem, True)
+            ):
+                eg.actionThread.Call(pluginItem.Delete)
+                return None
             eg.actionThread.Call(pluginItem.Execute)
         self.StoreItem(pluginItem)
         if pluginInfo.createMacrosOnAdd:

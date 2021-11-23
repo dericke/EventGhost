@@ -124,11 +124,9 @@ class PluginInstanceInfo(PluginModuleInfo):
         if items is None:
             return
         for item in items:
-            if isinstance(item, type) and issubclass(item, eg.ActionBase):
-                item.plugin = None
-            else:
+            if not isinstance(item, type) or not issubclass(item, eg.ActionBase):
                 self.DeleteActionListItems(item.items)
-                item.plugin = None
+            item.plugin = None
         del items
 
     @classmethod

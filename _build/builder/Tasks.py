@@ -50,19 +50,18 @@ class BuildVersionFile(builder.Task):
         buildSetup = self.buildSetup
         buildSetup.buildTime = time.time()
         filename = join(buildSetup.tmpDir, "VersionInfo.py")
-        outfile = open(filename, "wt")
-        base = buildSetup.appVersion.split("-")[0]
-        major, minor, patch, alpha, beta, rc = buildSetup.appVersionInfo
-        outfile.write("string = '{0}'\n".format(buildSetup.appVersion))
-        outfile.write("base = '{0}'\n".format(base))
-        outfile.write("major = {0}\n".format(major))
-        outfile.write("minor = {0}\n".format(minor))
-        outfile.write("patch = {0}\n".format(patch))
-        outfile.write("alpha = {0}\n".format(alpha))
-        outfile.write("beta = {0}\n".format(beta))
-        outfile.write("rc = {0}\n".format(rc))
-        outfile.write("buildTime = {0}\n".format(buildSetup.buildTime))
-        outfile.close()
+        with open(filename, "wt") as outfile:
+            base = buildSetup.appVersion.split("-")[0]
+            major, minor, patch, alpha, beta, rc = buildSetup.appVersionInfo
+            outfile.write("string = '{0}'\n".format(buildSetup.appVersion))
+            outfile.write("base = '{0}'\n".format(base))
+            outfile.write("major = {0}\n".format(major))
+            outfile.write("minor = {0}\n".format(minor))
+            outfile.write("patch = {0}\n".format(patch))
+            outfile.write("alpha = {0}\n".format(alpha))
+            outfile.write("beta = {0}\n".format(beta))
+            outfile.write("rc = {0}\n".format(rc))
+            outfile.write("buildTime = {0}\n".format(buildSetup.buildTime))
 
 
 class ReleaseToWeb(builder.Task):

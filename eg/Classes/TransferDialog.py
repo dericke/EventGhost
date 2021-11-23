@@ -162,14 +162,13 @@ class TransferDialog(wx.Dialog):
             os.makedirs(dirname(dest))
         except:
             pass
-        outfile = open(dest, "wb")
-        while True:
-            data = infile.read(32768)
-            if len(data) == 0:
-                break
-            outfile.write(data)
-        infile.close()
-        outfile.close()
+        with open(dest, "wb") as outfile:
+            while True:
+                data = infile.read(32768)
+                if len(data) == 0:
+                    break
+                outfile.write(data)
+            infile.close()
 
     def HttpGetSize(self, path):
         testFile = urllib2.urlopen(path)
@@ -237,7 +236,7 @@ class TransferDialog(wx.Dialog):
         log("Getting directory listing...")
         fileList = client.listdir(destDir)
         log("Creating temp name.")
-        for i in range(0, 999999):
+        for i in range(999999):
             tempFileName = "tmp%06d" % i
             if tempFileName not in fileList:
                 break
@@ -292,10 +291,7 @@ class TransferDialog(wx.Dialog):
     def _SetProgress(self, speed, pos, size):
         self.speed = speed
         overallPos = self.transferedSize + pos
-        if speed:
-            remainingTime = (self.overallSize - overallPos) / speed
-        else:
-            remainingTime = 1000
+        remainingTime = (self.overallSize - overallPos) / speed if speed else 1000
         percent = int((pos * 100.0) / size)
         allPercent = int(overallPos * 100.0 / self.overallSize)
         self.gauge.SetValue(percent * 10)
@@ -354,8 +350,7 @@ class ProgressFile(object):
         self.lastSecond = now
         if numBytes > 0:
             self.lastBytes = now
-        if self.rate < 0:
-            self.rate = 0
+        self.rate = max(self.rate, 0)
 
     def close(self):  #IGNORE:C0103 Invalid name "read"
         """
@@ -364,7 +359,7 @@ class ProgressFile(object):
         self.fileObject.close()
         elapsed = (clock() - self.startTime)  # NOQA
 
-    def read(self, size):  #IGNORE:C0103 Invalid name "read"
+    def read(self, size):    #IGNORE:C0103 Invalid name "read"
         """
         Implements a file-like read() but also updates the progress variables.
         """
@@ -372,9 +367,11 @@ class ProgressFile(object):
         numBytes = len(data)
         self.pos += numBytes
         self.Add(numBytes)
-        if self.progressCallback:
-            if self.progressCallback(self.rate, self.pos, self.size) is False:
-                return ""
+        if (
+            self.progressCallback
+            and self.progressCallback(self.rate, self.pos, self.size) is False
+        ):
+            return ""
         return data
 
     def Reset(self):

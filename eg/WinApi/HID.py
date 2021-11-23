@@ -62,7 +62,7 @@ class HIDThread(threading.Thread):
         self.ButtonCallback = None
         self.ValueCallback = None
         self.StopCallback = None
-        threading.Thread.__init__(self, name = threadName if threadName else self.devicePath)
+        threading.Thread.__init__(self, name=threadName or self.devicePath)
 
     @eg.LogIt
     def AbortThread(self):
@@ -508,7 +508,7 @@ def GetDevicePath(
                 if item.devicePath == devicePath or (useDeviceIndex and deviceIndex == found):
                     #found right device
                     return item.devicePath
-                found = found + 1
+                found += 1
                 device = item
 
     if found == 1:

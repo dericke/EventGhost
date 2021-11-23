@@ -27,10 +27,7 @@ class ActionSelectButton(wx.Window):
             treeLink = eg.TreeLink(eg.Utils.GetTopLevelWindow(parent).treeItem)
         self.treeLink = treeLink
         self.action = treeLink.target
-        if self.action is None:
-            actionName = ""
-        else:
-            actionName = self.action.GetLabel()
+        actionName = "" if self.action is None else self.action.GetLabel()
         self.title = title
         self.mesg = mesg
         wx.Window.__init__(self, parent, -1)
@@ -61,7 +58,7 @@ class ActionSelectButton(wx.Window):
         )
         if result:
             action = result[0]
-            self.textBox.SetLabel(result[0].GetLabel())
+            self.textBox.SetLabel(action.GetLabel())
             self.action = action
             self.ProcessEvent(
                 wx.CommandEvent(wx.EVT_TEXT.evtType[0], self.GetId())

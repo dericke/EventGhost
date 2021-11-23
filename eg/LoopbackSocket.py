@@ -311,7 +311,7 @@ class Server(threading.Thread):
             eg.PrintDebugNotice('stopped.')
 
     def Send(self, message):
-        self.threads = list(t for t in self.threads if t.isAlive())
+        self.threads = [t for t in self.threads if t.isAlive()]
         for t in self.threads:
             t.Send(message)
 

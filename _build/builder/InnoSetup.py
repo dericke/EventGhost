@@ -65,21 +65,19 @@ class InnoInstaller(object):
             "rt"
         ).read()
         innoScriptPath = join(self.buildSetup.tmpDir, "Setup.iss")
-        issFile = open(innoScriptPath, "w")
-        templateDict = {}
-        for key, value in self.buildSetup.__dict__.iteritems():
-            if isinstance(value, unicode):
-                value = EncodePath(value)
-            templateDict[key] = value
+        with open(innoScriptPath, "w") as issFile:
+            templateDict = {}
+            for key, value in self.buildSetup.__dict__.iteritems():
+                if isinstance(value, unicode):
+                    value = EncodePath(value)
+                templateDict[key] = value
 
-        issFile.write(innoScriptTemplate % templateDict)
-        for section, lines in self.innoSections.iteritems():
-            issFile.write("[%s]\n" % section)
-            for line in lines:
-                issFile.write("%s\n" % line)
-        issFile.close()
-
-        if not (StartProcess(GetInnoCompilerPath(), innoScriptPath, "/Q") == 0):
+            issFile.write(innoScriptTemplate % templateDict)
+            for section, lines in self.innoSections.iteritems():
+                issFile.write("[%s]\n" % section)
+                for line in lines:
+                    issFile.write("%s\n" % line)
+        if StartProcess(GetInnoCompilerPath(), innoScriptPath, "/Q") != 0:
             raise InnoSetupError
 
 

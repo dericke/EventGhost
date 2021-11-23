@@ -45,10 +45,7 @@ class NamespaceTree(wx.gizmos.TreeListCtrl):
         for name, value in self.namespace.__dict__.items():
             item = self.AppendItem(root, name)
             typeStr = str(type(value))
-            if typeStr.startswith("<class "):
-                typeStr = "class"
-            else:
-                typeStr = typeStr[7:-2]
+            typeStr = "class" if typeStr.startswith("<class ") else typeStr[7:-2]
             self.SetItemText(item, typeStr, 1)
             valueStr = repr(value)
             self.SetItemText(item, valueStr, 2)

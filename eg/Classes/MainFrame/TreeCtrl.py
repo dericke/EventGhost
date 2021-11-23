@@ -106,23 +106,21 @@ class DropTarget(wx.PyDropTarget):
         # Called when OnDrop returns True.
         tree = self.treeCtrl
         #tree.ClearInsertMark()
-        if self.isExternalDrag and self.whereToDrop is not None:
-            # We need to get the data and do something with it.
-            if self.GetData():
-                # copy the data from the drag source to our data object
-                #if tree.GetSelection().IsOk():
-                #    tree.SelectItem(tree.GetSelection(), False)
-                if self.lastHighlighted is not None:
-                    tree.SetItemDropHighlight(self.lastHighlighted, False)
-                if self.customData.GetDataSize() > 0:
-                    label = self.customData.GetData()
-                    self.customData.SetData("")
-                    parent, pos = self.whereToDrop
-                    eg.UndoHandler.NewEvent(tree.document).Do(
-                        parent,
-                        pos,
-                        label
-                    )
+        if self.isExternalDrag and self.whereToDrop is not None and self.GetData():
+            # copy the data from the drag source to our data object
+            #if tree.GetSelection().IsOk():
+            #    tree.SelectItem(tree.GetSelection(), False)
+            if self.lastHighlighted is not None:
+                tree.SetItemDropHighlight(self.lastHighlighted, False)
+            if self.customData.GetDataSize() > 0:
+                label = self.customData.GetData()
+                self.customData.SetData("")
+                parent, pos = self.whereToDrop
+                eg.UndoHandler.NewEvent(tree.document).Do(
+                    parent,
+                    pos,
+                    label
+                )
         # what is returned signals the source what to do
         # with the original data (move, copy, etc.)  In this
         # case we just return the suggested value given to us.
@@ -161,13 +159,17 @@ class DropTarget(wx.PyDropTarget):
 
         # expand a container, if the mouse is hold over it for some time
         if dstItemId == self.lastTargetItemId:
-            if self.lastDropTime + 0.6 < clock():
-                if (
-                    dstNode.__class__ == dstNode.document.FolderItem or
-                    insertionHint & HINT_MOVE_INSIDE
-                ):
-                    if not tree.IsExpanded(dstItemId):
-                        tree.Expand(dstItemId)
+            if (
+                self.lastDropTime + 0.6 < clock()
+                and (
+                    (
+                        dstNode.__class__ == dstNode.document.FolderItem
+                        or insertionHint & HINT_MOVE_INSIDE
+                    )
+                )
+                and not tree.IsExpanded(dstItemId)
+            ):
+                tree.Expand(dstItemId)
         else:
             self.lastDropTime = clock()
             self.lastTargetItemId = dstItemId
@@ -456,22 +458,21 @@ class TreeCtrl(wx.TreeCtrl):
     def CreateTreeItemAt(self, node, parentId, parentNode, pos):
         if pos == -1 or pos >= len(parentNode.childs):
             return self.CreateTreeItem(node, parentId)
-        else:
-            itemId = self.InsertItemBefore(
-                parentId,
-                pos,
-                node.GetLabel(),
-                node.imageIndex,
-                -1,
-                wx.TreeItemData(node)
-            )
-            node.SetAttributes(self, itemId)
-            self.visibleNodes[node] = itemId
-            if node.childs:
-                self.SetItemHasChildren(itemId, True)
-            if node in self.expandedNodes:
-                self.Expand(itemId)
-            return itemId
+        itemId = self.InsertItemBefore(
+            parentId,
+            pos,
+            node.GetLabel(),
+            node.imageIndex,
+            -1,
+            wx.TreeItemData(node)
+        )
+        node.SetAttributes(self, itemId)
+        self.visibleNodes[node] = itemId
+        if node.childs:
+            self.SetItemHasChildren(itemId, True)
+        if node in self.expandedNodes:
+            self.Expand(itemId)
+        return itemId
 
     @eg.AssertInMainThread
     @eg.LogIt
@@ -768,10 +769,9 @@ class TreeCtrl(wx.TreeCtrl):
                 itemId = self.visibleNodes[selectedNode]
                 self.SelectItem(itemId)
             firstVisibleItem = self.document.firstVisibleItem
-            if firstVisibleItem:
-                if firstVisibleItem in self.visibleNodes:
-                    itemId = self.visibleNodes[firstVisibleItem]
-                    self.ScrollTo(itemId)
+            if firstVisibleItem and firstVisibleItem in self.visibleNodes:
+                itemId = self.visibleNodes[firstVisibleItem]
+                self.ScrollTo(itemId)
         finally:
             self.Thaw()
 
@@ -811,9 +811,8 @@ class TreeCtrl(wx.TreeCtrl):
         if node in self.expandedNodes:
             if not self.IsExpanded(itemId):
                 self.Expand(itemId)
-        else:
-            if self.IsExpanded(itemId):
-                self.Collapse(itemId)
+        elif self.IsExpanded(itemId):
+            self.Collapse(itemId)
 
     @eg.AssertInMainThread
     @eg.LogIt

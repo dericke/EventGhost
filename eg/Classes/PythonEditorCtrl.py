@@ -281,19 +281,20 @@ class PythonEditorCtrl(StyledTextCtrl):
         if numtabs == 0:
             numtabs = self.GetLineIndentation(linenumber) / indentSize
 
-        if True:
-            checkat = self.GetLineEndPosition(linenumber) - 1
-            if self.GetCharAt(checkat) == ord(':'):
-                numtabs = numtabs + 1
-            else:
-                lastline = self.GetLine(linenumber)
-                #Remove Comment:
-                comment = lastline.find('#')
-                if comment > -1:
-                    lastline = lastline[:comment]
-                if self.reslash.search(lastline.rstrip()) is None:
-                    if self.rekeyword.search(lastline) is not None:
-                        numtabs = numtabs - 1
+        checkat = self.GetLineEndPosition(linenumber) - 1
+        if self.GetCharAt(checkat) == ord(':'):
+            numtabs = numtabs + 1
+        else:
+            lastline = self.GetLine(linenumber)
+            #Remove Comment:
+            comment = lastline.find('#')
+            if comment > -1:
+                lastline = lastline[:comment]
+            if (
+                self.reslash.search(lastline.rstrip()) is None
+                and self.rekeyword.search(lastline) is not None
+            ):
+                numtabs = numtabs - 1
         #Go to current line to add tabs
 
         self.SetTargetStart(pos + 1)
@@ -307,7 +308,7 @@ class PythonEditorCtrl(StyledTextCtrl):
         x = 0
         while (x < numtabs):
             self.AddText(' ' * indentSize)
-            x = x + 1
+            x += 1
         #/Auto Indent Code
 
         #Ensure proper keyboard navigation:
@@ -322,15 +323,10 @@ class PythonEditorCtrl(StyledTextCtrl):
         line = line + 1
 
         while line <= lastChild:
-            if force:
-                if visLevels > 0:
-                    self.ShowLines(line, line)
-                else:
-                    self.HideLines(line, line)
-            else:
-                if doExpand:
-                    self.ShowLines(line, line)
-
+            if force and visLevels > 0 or not force and doExpand:
+                self.ShowLines(line, line)
+            elif force:
+                self.HideLines(line, line)
             if level == -1:
                 level = self.GetFoldLevel(line)
 
@@ -403,7 +399,7 @@ class PythonEditorCtrl(StyledTextCtrl):
 
     def OnKeyPressed(self, event):
         keycode = event.GetKeyCode()
-        if (keycode == wx.WXK_RETURN) or (keycode == 372):
+        if keycode in [wx.WXK_RETURN, 372]:
             self.CmdKeyExecute(STC_CMD_NEWLINE)
             self.AutoIndent()
         elif keycode == wx.WXK_TAB and event.GetModifiers() == wx.MOD_CONTROL:
@@ -413,25 +409,26 @@ class PythonEditorCtrl(StyledTextCtrl):
 
     def OnMarginClick(self, event):
         # fold and unfold as needed
-        if event.GetMargin() == 2:
-            if event.GetShift() and event.GetControl():
-                self.FoldAll()
-            else:
-                lineClicked = self.LineFromPosition(event.GetPosition())
+        if event.GetMargin() != 2:
+            return
+        if event.GetShift() and event.GetControl():
+            self.FoldAll()
+        else:
+            lineClicked = self.LineFromPosition(event.GetPosition())
 
-                if self.GetFoldLevel(lineClicked) & STC_FOLDLEVELHEADERFLAG:
-                    if event.GetShift():
-                        self.SetFoldExpanded(lineClicked, True)
-                        self.Expand(lineClicked, True, True, 1)
-                    elif event.GetControl():
-                        if self.GetFoldExpanded(lineClicked):
-                            self.SetFoldExpanded(lineClicked, False)
-                            self.Expand(lineClicked, False, True, 0)
-                        else:
-                            self.SetFoldExpanded(lineClicked, True)
-                            self.Expand(lineClicked, True, True, 100)
+            if self.GetFoldLevel(lineClicked) & STC_FOLDLEVELHEADERFLAG:
+                if event.GetShift():
+                    self.SetFoldExpanded(lineClicked, True)
+                    self.Expand(lineClicked, True, True, 1)
+                elif event.GetControl():
+                    if self.GetFoldExpanded(lineClicked):
+                        self.SetFoldExpanded(lineClicked, False)
+                        self.Expand(lineClicked, False, True, 0)
                     else:
-                        self.ToggleFold(lineClicked)
+                        self.SetFoldExpanded(lineClicked, True)
+                        self.Expand(lineClicked, True, True, 100)
+                else:
+                    self.ToggleFold(lineClicked)
 
     def OnModified(self, event):
         wx.PostEvent(self, eg.ValueChangedEvent(self.GetId()))
@@ -457,7 +454,6 @@ class PythonEditorCtrl(StyledTextCtrl):
     def OnUpdateUI(self, dummyEvent):
         # check for matching braces
         braceAtCaret = -1
-        braceOpposite = -1
         charBefore = None
         caretPos = self.GetCurrentPos()
 
@@ -484,9 +480,7 @@ class PythonEditorCtrl(StyledTextCtrl):
             ):
                 braceAtCaret = caretPos
 
-        if braceAtCaret >= 0:
-            braceOpposite = self.BraceMatch(braceAtCaret)
-
+        braceOpposite = self.BraceMatch(braceAtCaret) if braceAtCaret >= 0 else -1
         if braceAtCaret != -1 and braceOpposite == -1:
             self.BraceBadLight(braceAtCaret)
         else:

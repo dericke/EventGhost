@@ -93,7 +93,7 @@ class Password(object):
                 newDatabase[guid] = cls.database[guid]
             except KeyError:
                 pass
-        if len(newDatabase) == 0:
+        if not newDatabase:
             return ""
         text = pickle.dumps(newDatabase)
         key = cls.masterkey

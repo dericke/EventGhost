@@ -309,10 +309,7 @@ class LogCtrl(wx.ListCtrl):
         # self.Thaw()
 
     def SetIndent(self, shouldIndent):
-        if shouldIndent:
-            self.indent = "   "
-        else:
-            self.indent = ""
+        self.indent = "   " if shouldIndent else ""
         self.Refresh()
 
     def SetDateLogging(self, flag):

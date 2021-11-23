@@ -45,9 +45,8 @@ class MoveTo(UndoHandlerBase):
         oldParent = item.parent
         oldPos = self.oldPos
         self.oldPos = item.parent.childs.index(item)
-        if parent1 == parent:
-            if pos1 < oldPos:
-                oldPos += 1
+        if parent1 == parent and pos1 < oldPos:
+            oldPos += 1
         item.MoveItemTo(parent, oldPos)
         self.oldParentPath = oldParent.GetPath()
         self.newPositionData = eg.TreePosition(item)

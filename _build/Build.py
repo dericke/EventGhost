@@ -159,20 +159,12 @@ class MyBuilder(builder.Builder):
                 coreplugins.append(f.replace("core-plugin", ""))
                 files.remove(f)
 
-        installFiles = []
-        for f in files:
-            if not f.startswith(tuple(noincludes)):
-                if f.count("\\") == 0 and f not in rootIncludes:
-                    pass
-                else:
-                    #if f.startswith(tuple(coreplugins)):
-                    installFiles.append([f, "{app}"])
-                    #else:
-                    #    # Install to ProgramData\EventGhost\plugins
-                    #    installFiles.append([f,
-                    #        "{commonappdata}\\%s" % self.appName])
-
-        return installFiles
+        return [
+            [f, "{app}"]
+            for f in files
+            if not f.startswith(tuple(noincludes))
+            and (f.count("\\") != 0 or f in rootIncludes)
+        ]
 
 
 MyBuilder().Start()

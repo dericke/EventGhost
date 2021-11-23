@@ -136,9 +136,8 @@ class CheckSourceCode(builder.Task):
         """
         Removes trailing whitespace from the source file.
         """
-        sourceFile = open(path, "rt")
-        oldContent = sourceFile.read()
-        sourceFile.close()
+        with open(path, "rt") as sourceFile:
+            oldContent = sourceFile.read()
         lines = [line.rstrip() for line in oldContent.splitlines()]
         while len(lines) and lines[-1].strip() == "":
             del lines[-1]
@@ -146,6 +145,5 @@ class CheckSourceCode(builder.Task):
         lines.append("")
         newContent = "\n".join(lines)
         if oldContent != newContent:
-            sourceFile = open(path, "wt")
-            sourceFile.write(newContent)
-            sourceFile.close()
+            with open(path, "wt") as sourceFile:
+                sourceFile.write(newContent)

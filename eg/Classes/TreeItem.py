@@ -72,7 +72,7 @@ class TreeItem(object):
 
         if isinstance(self.name, str):
             self.name = unicode(self.name, "utf8")
-        self.isEnabled = not get('enabled') == "False"
+        self.isEnabled = get('enabled') != "False"
         self.xmlId = TreeLink.NewXmlId(int(get('id', -1)), self)
 
     def AskDelete(self):
@@ -114,9 +114,8 @@ class TreeItem(object):
             return False
         try:
             dataObj = wx.CustomDataObject("DragEventItem")
-            if wx.TheClipboard.GetData(dataObj):
-                if self.DropTest(eg.EventItem):
-                    return True
+            if wx.TheClipboard.GetData(dataObj) and self.DropTest(eg.EventItem):
+                return True
 
             dataObj = wx.TextDataObject()
             if not wx.TheClipboard.GetData(dataObj):
@@ -331,9 +330,8 @@ class TreeItem(object):
         wx.CallAfter(eg.Notify, "NodeMoveBegin")
         oldPos = self.parent.RemoveChild(self)
         newPos = pos
-        if newParentItem == self.parent:
-            if newPos > oldPos:
-                newPos -= 1
+        if newParentItem == self.parent and newPos > oldPos:
+            newPos -= 1
         self.parent = newParentItem
         newParentItem.AddChild(self, newPos)
         wx.CallAfter(eg.Notify, "NodeMoveEnd")

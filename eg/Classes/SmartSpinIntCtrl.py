@@ -40,11 +40,7 @@ class SmartSpinIntCtrl(eg.SmartSpinNumCtrl):
         name = "eg.SmartSpinIntCtrl",
     ):
         allowNegative = bool(min < 0)
-        if max is None:
-            integerWidth = 5
-        else:
-            integerWidth = int(math.ceil(math.log10(max + 1)))
-
+        integerWidth = 5 if max is None else int(math.ceil(math.log10(max + 1)))
         eg.SmartSpinNumCtrl.__init__(
             self,
             parent,

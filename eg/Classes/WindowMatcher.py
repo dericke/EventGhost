@@ -112,7 +112,7 @@ class WindowMatcher:
             return topWindowsHwnds
         childClassMatch = self.childClassMatch
         childNameMatch = self.childNameMatch
-        childHwnds = [
+        return [
             childHwnd for parentHwnd in topWindowsHwnds
             for childHwnd in GetWindowChildsList(
                 parentHwnd, includeInvisible
@@ -121,7 +121,6 @@ class WindowMatcher:
                 childNameMatch(GetWindowText(childHwnd))
             )
         ]
-        return childHwnds
 
     def FindMatch(self):
         hwnds = self.Find()
@@ -191,16 +190,15 @@ def CompileString(pattern):
         endPos = pattern.find('{', startPos)
     tmp += pattern[startPos:]
     res.append(tmp)
-    if useRegex:
-        pattern = "^"
-        for tmp in res:
-            if type(tmp) in StringTypes:
-                pattern += escape(tmp)
-            elif tmp == MatchSingleChar:
-                pattern += "."
-            elif tmp == MatchAny:
-                pattern += ".*"
-        pattern += "$"
-        return compile(pattern).match
-    else:
+    if not useRegex:
         return lambda s: s == pattern
+    pattern = "^"
+    for tmp in res:
+        if type(tmp) in StringTypes:
+            pattern += escape(tmp)
+        elif tmp == MatchSingleChar:
+            pattern += "."
+        elif tmp == MatchAny:
+            pattern += ".*"
+    pattern += "$"
+    return compile(pattern).match

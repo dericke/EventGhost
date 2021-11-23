@@ -564,14 +564,10 @@ class MainFrame(wx.Frame):
         wxFrame.SetWindowStyleFlag()
         :return: None
         """
-        if eg.config.showTrayIcon:
-            if len(self.openDialogs):
-                style = ~(wx.MINIMIZE_BOX | wx.CLOSE_BOX) & self.style
-            else:
-                style = self.style
+        if eg.config.showTrayIcon and len(self.openDialogs):
+            style = ~(wx.MINIMIZE_BOX | wx.CLOSE_BOX) & self.style
         else:
             style = self.style
-
         wx.Frame.SetWindowStyleFlag(self, style)
 
     @eg.LogIt
@@ -637,16 +633,14 @@ class MainFrame(wx.Frame):
     def OnFocusChange(self, focus):
         if focus == self.lastFocus:
             return
-        if focus == self.treeCtrl.editControl:
+        if (
+            focus == self.treeCtrl.editControl
+            or self.lastFocus == self.treeCtrl.editControl
+        ):
             # avoid programmatic change of the selected item while editing
             self.UpdateViewOptions()
             # temporarily disable the "Del" accelerator
             #self.SetAcceleratorTable(wx.AcceleratorTable([]))
-        elif self.lastFocus == self.treeCtrl.editControl:
-            # restore the "Del" accelerator
-            #self.SetAcceleratorTable(self.acceleratorTable)
-            self.UpdateViewOptions()
-
         self.lastFocus = focus
         toolBar = self.toolBar
         canCut, canCopy, canPython, canPaste = self.GetEditCmdState()[:4]
@@ -1074,9 +1068,8 @@ class MainFrame(wx.Frame):
                 self.addChildren(item)
             self.setText('')
             obj = self.GetPyData(item)
-            if wx.Platform == '__WXMSW__':
-                if obj is None:  # Windows bug fix.
-                    return
+            if wx.Platform == '__WXMSW__' and obj is None:  # Windows bug fix.
+                return
             self.SetItemHasChildren(item, self.objHasChildren(obj))
             otype = type(obj)
             text = u''
@@ -1098,18 +1091,15 @@ class MainFrame(wx.Frame):
                             inspect.getdoc(obj).strip() + '"""'
                 except:
                     pass
-            if otype is types.InstanceType:  # NOQA
-                try:
+            try:
+                if otype is types.InstanceType:
                     text += '\n\nClass Definition:\n\n' + \
                             inspect.getsource(obj.__class__)
-                except:
-                    pass
-            else:
-                try:
+                else:
                     text += '\n\nSource Code:\n\n' + \
                             inspect.getsource(obj)
-                except:
-                    pass
+            except:
+                pass
             self.setText(text)
         FillingTree.display.im_func.func_code = display.func_code
 

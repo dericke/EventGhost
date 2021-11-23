@@ -138,9 +138,8 @@ class PluginInstall(object):
             zipfile = ZipFile(filepath, "r", ZIP_DEFLATED)
             zipfile.extractall(tmpDir)
             zipfile.close()
-            zipfile = open(os.path.join(tmpDir, "info.py"), "r")
-            pluginData = SafeExecParser.Parse(zipfile.read())
-            zipfile.close()
+            with open(os.path.join(tmpDir, "info.py"), "r") as zipfile:
+                pluginData = SafeExecParser.Parse(zipfile.read())
             for name in os.listdir(tmpDir):
                 path = os.path.join(tmpDir, name)
                 if os.path.isdir(path):
@@ -276,9 +275,8 @@ class SafeExecParser(object):
         return mod
 
     def VisitName(self, node):
-        if isinstance(node.ctx, ast.Load):
-            if node.id in ("True", "False", "None"):
-                return getattr(__builtin__, node.id)
+        if isinstance(node.ctx, ast.Load) and node.id in ("True", "False", "None"):
+            return getattr(__builtin__, node.id)
         return node.id
 
     def VisitStr(self, node):

@@ -491,16 +491,15 @@ class WinUsb(object):
                 byref(driverInfoData)
             ):
                 err = GetLastError()
-                if err == ERROR_NO_MORE_ITEMS:
-                    devices[hardwareId] = DeviceInfo(
-                        name = "<unknown name>",
-                        version = "",
-                        hardwareId = hardwareId,
-                        provider = "<unknown provider",
-                    )
-                    continue
-                else:
+                if err != ERROR_NO_MORE_ITEMS:
                     raise WinError(err)
+                devices[hardwareId] = DeviceInfo(
+                    name = "<unknown name>",
+                    version = "",
+                    hardwareId = hardwareId,
+                    provider = "<unknown provider",
+                )
+                continue
             version = driverInfoData.DriverVersion
             versionStr = "%d.%d.%d.%d" % (
                 (version >> 48) & 0xFFFF,

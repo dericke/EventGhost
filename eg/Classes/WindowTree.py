@@ -95,11 +95,11 @@ class WindowTree(wx.TreeCtrl):
                 name = "\"" + name + "\" "
             index = self.AppendItem(item, name + className, 0)
             self.SetPyData(index, hwnd)
-            if className == "Edit" or className == "TEdit":
+            if className in ["Edit", "TEdit"]:
                 self.SetItemImage(index, 1, which=wx.TreeItemIcon_Normal)
-            elif className == "Static" or className == "TStaticText":
+            elif className in ["Static", "TStaticText"]:
                 self.SetItemImage(index, 2, which=wx.TreeItemIcon_Normal)
-            elif className == "Button" or className == "TButton":
+            elif className in ["Button", "TButton"]:
                 self.SetItemImage(index, 3, which=wx.TreeItemIcon_Normal)
             elif GetClassName(parentHwnd) == "MDIClient":
                 icon = GetHwndIcon(hwnd)
@@ -154,9 +154,7 @@ class WindowTree(wx.TreeCtrl):
                 continue
             if name != '':
                 name = '"%s"' % name
-            iconIndex = 0
-            if icon:
-                iconIndex = self.imageList.AddIcon(icon)
+            iconIndex = self.imageList.AddIcon(icon) if icon else 0
             newItem = self.AppendItem(item, name)
             self.SetPyData(newItem, hwnd)
             self.SetItemText(newItem, name + className)

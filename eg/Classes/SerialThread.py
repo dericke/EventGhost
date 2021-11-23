@@ -185,16 +185,15 @@ class SerialThread(Thread):
         while self.keepAlive:
             self.readCondition.acquire()
             while len(self.buffer):
-                if self.readEventLock.acquire(0):
-                    if self.readEventCallback:
-                        try:
-                            self.readEventCallback(self)
-                        except Exception:
-                            eg.PrintTraceback()
-                    self.readEventLock.release()
-                    sleep(0.001)
-                else:
+                if not self.readEventLock.acquire(0):
                     break
+                if self.readEventCallback:
+                    try:
+                        self.readEventCallback(self)
+                    except Exception:
+                        eg.PrintTraceback()
+                self.readEventLock.release()
+                sleep(0.001)
             self.readCondition.wait()
             self.readCondition.release()
 
@@ -233,7 +232,7 @@ class SerialThread(Thread):
         lpCC = pointer(commconfig)
         dwSize = DWORD(0)
         lpdwSize = byref(dwSize)
-        for i in range(0, 255):
+        for i in range(255):
             name = 'COM%d' % (i + 1)
             res = GetDefaultCommConfig(name, lpCC, lpdwSize)
             if res == 1 or (res == 0 and GetLastError() == 122):
@@ -301,10 +300,7 @@ class SerialThread(Thread):
         #the "//./COMx" format is required for devices >= 9
         #not all versions of windows seem to support this properly
         #so that the first few ports are used with the DOS device name
-        if port < 9:
-            deviceStr = 'COM%d' % (port + 1)
-        else:
-            deviceStr = '\\\\.\\COM%d' % (port + 1)
+        deviceStr = 'COM%d' % (port + 1) if port < 9 else '\\\\.\\COM%d' % (port + 1)
         try:
             self.hFile = self._CreateFile(
                 deviceStr,
@@ -387,14 +383,12 @@ class SerialThread(Thread):
                 )
                 if not returnValue:
                     err = GetLastError()
-                    if err != 0 and err != ERROR_IO_PENDING:
+                    if err not in [0, ERROR_IO_PENDING]:
                         raise SerialError()
                     waitingOnRead = True
-                else:
-                    # read completed immediately
-                    if dwRead.value:
-                        self.HandleReceive(lpBuf.raw)
-                        continue
+                elif dwRead.value:
+                    self.HandleReceive(lpBuf.raw)
+                    continue
 
             ret = MsgWaitForMultipleObjects(
                 2, pHandles, 0, 100000, QS_ALLINPUT
@@ -417,10 +411,7 @@ class SerialThread(Thread):
                 self.readCondition.notifyAll()
                 self.readCondition.release()
                 break
-            elif ret == WAIT_TIMEOUT:
-                #print "WAIT_TIMEOUT"
-                pass
-            else:
+            elif ret != WAIT_TIMEOUT:
                 raise SerialError("Unknown message in ReceiveThreadProc")
 
     def ReportStatusEvent(self, statusEvent):
@@ -580,7 +571,7 @@ class SerialThread(Thread):
         if returnValue != 0:
             return
         err = GetLastError()
-        if err != 0 and err != ERROR_IO_PENDING:
+        if err not in [0, ERROR_IO_PENDING]:
             raise SerialError()
         if not GetOverlappedResult(
             self.hFile,

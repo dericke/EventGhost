@@ -72,7 +72,7 @@ class TreeItemBrowseCtrl(wx.TreeCtrl):
             return
         item = selectItem
         path = []
-        while item is not selectItem.root:
+        while item is not item.root:
             path.append(item)
             item = item.parent
         treeId = root

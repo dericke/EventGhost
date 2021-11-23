@@ -147,8 +147,7 @@ def GetGitHubConfig():
         elif cfg[i].strip() == "":
             continue
         key, val = cfg[i].strip().split('=')
-        gitcfg.update({key.strip(): val.strip()})
-
+        gitcfg[key.strip()] = val.strip()
     # no entry for 'token' and/or 'user' found in .gitconfig
     if "token" not in gitcfg or "user" not in gitcfg:
         raise KeyError
@@ -169,35 +168,34 @@ def GetGitHubConfig():
     while page > 0:
         rc, data = gh.user.repos.get(page=page)
         page = NextPage(gh)
-        if rc == 200:
-            for repo in data:
-                if repo["name"] == "EventGhost":
-                    usr, rep = repo["full_name"].split("/")
-                    page2 = 1
-                    branches = []
-                    while page2 > 0:
-                        rc2, data2 = gh.repos[usr][rep].branches.get(page=page2)
-                        if rc2 == 200:
-                            for br in data2:
-                                branches.append(br["name"])
-                        page2 = NextPage(gh)
-
-                    gitcfg["all_repos"].update({
-                        repo["full_name"]: {
-                            "name": repo["name"],
-                            "all_branches": branches,
-                            "def_branch": local_branch if local_branch in
-                                          branches else repo["default_branch"]
-                        }
-                    })
-                    gitcfg.update({
-                        "repo": repo["name"],
-                        "repo_full": repo["full_name"],
-                        "branch": local_branch if local_branch in
-                                          branches else repo["default_branch"]
-                    })
-        else:
+        if rc != 200:
             raise ValueError
+        for repo in data:
+            if repo["name"] == "EventGhost":
+                usr, rep = repo["full_name"].split("/")
+                page2 = 1
+                branches = []
+                while page2 > 0:
+                    rc2, data2 = gh.repos[usr][rep].branches.get(page=page2)
+                    if rc2 == 200:
+                        for br in data2:
+                            branches.append(br["name"])
+                    page2 = NextPage(gh)
+
+                gitcfg["all_repos"].update({
+                    repo["full_name"]: {
+                        "name": repo["name"],
+                        "all_branches": branches,
+                        "def_branch": local_branch if local_branch in
+                                      branches else repo["default_branch"]
+                    }
+                })
+                gitcfg.update({
+                    "repo": repo["name"],
+                    "repo_full": repo["full_name"],
+                    "branch": local_branch if local_branch in
+                                      branches else repo["default_branch"]
+                })
     return gitcfg
 
 def GetHtmlHelpCompilerPath():
@@ -349,10 +347,9 @@ def ListDir(path, skip_dirs=[], fullpath=True):
                 parts = set(subdir.split('\\'))
                 if parts.intersection(skip_dirs):
                     continue
-                else:
-                    subpath = normpath(join(path, subdir))
-                    sublist = ListDir(subpath, skip_dirs)
-                    files.extend(sublist)
+                subpath = normpath(join(path, subdir))
+                sublist = ListDir(subpath, skip_dirs)
+                files.extend(sublist)
     if not fullpath:
         os.chdir(cwd)
     return files
@@ -384,16 +381,14 @@ def ParseVersion(ver):
         and os.environ["APPVEYOR_REPO_TAG"] == "false"
     ):
         return (time.strftime("WIP-%Y.%m.%d-%H.%M.%S"), ("0",) * 6)
-    else:
-        match = re.search(
-            "^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)" +
-            "(?:-alpha(?P<alpha>\d+)|-beta(?P<beta>\d+)|-rc(?P<rc>\d+))?$", ver
-        )
-        if match:
-            ver_info = tuple(map(lambda x: x or "0", match.groups()))
-            return (ver, ver_info)
-        else:
-            raise InvalidVersion
+    match = re.search(
+        "^(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)" +
+        "(?:-alpha(?P<alpha>\d+)|-beta(?P<beta>\d+)|-rc(?P<rc>\d+))?$", ver
+    )
+    if not match:
+        raise InvalidVersion
+    ver_info = tuple(map(lambda x: x or "0", match.groups()))
+    return (ver, ver_info)
 
 def StartProcess(*args):
     #SetIndent(1)
@@ -413,13 +408,12 @@ def StartProcess(*args):
         if errData is not None:
             sys.stderr.write(errData)
         inData = process.recv()
-        if inData is not None:
-            if inData:
-                sys.stdout.write(inData)
-            else:
-                time.sleep(0.1)
-        else:
+        if inData is None:
             break
+        if inData:
+            sys.stdout.write(inData)
+        else:
+            time.sleep(0.1)
     process.wait()
     #SetIndent(0)
     return process.returncode

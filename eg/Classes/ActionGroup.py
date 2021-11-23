@@ -105,10 +105,7 @@ class ActionGroup(object):
                     # this is a new sub-group
                     aList = parts[-1]
                     clsName, name, description = parts[1:4]
-                    if len(parts) == 6:
-                        iconFile = parts[3]
-                    else:
-                        iconFile = None
+                    iconFile = parts[3] if len(parts) == 6 else None
                     newGroup = group.AddGroup(
                         name,
                         description,
